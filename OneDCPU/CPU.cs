@@ -1,0 +1,133 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OneDCPU
+{
+    public static class CPU
+    {
+        public static int EvaluateBoard(Board board)
+        {
+            // count mine
+            int point = 0;
+            point += board.array.Count(s => { return s == BoxStates.Mine; });
+
+            // add special points
+            // edge bonus
+            if (board.array[0] == BoxStates.Mine)
+            {
+                point++;
+            }
+            if (board.array[^1] == BoxStates.Mine)
+            {
+                point++;
+            }
+
+            return point;
+        }
+
+        public static double EvaluatePoints(List<double> points)
+        {
+            double point = points.Average();
+            return point;
+        }
+
+        public static double EvaluatePoints(List<int> points)
+        {
+            List<double> doubleList = [.. points];
+            return EvaluatePoints(doubleList);
+        }
+
+        public static List<int> FindAllSetableBoxes(Board board, BoxStates side)
+        {
+            List<int> setables = new();
+            BoxStates opposite = (side == BoxStates.Mine) ? BoxStates.Opponent : BoxStates.Mine;
+
+            for (int i = 0; i < board.array.Length - 1; i++)
+            {
+                if (board.array[i] == BoxStates.None && board.array[i + 1] == opposite)
+                {
+                    setables.Add(i);
+                }
+                else if (board.array[i] == opposite && board.array[i + 1] == BoxStates.None)
+                {
+                    setables.Add(i + 1);
+                }
+            }
+
+            return setables;
+        }
+
+        public static (int move, double point) SelectMaxPointMove(List<(int move, double point)> moves)
+        {
+            (int move, double point) maxPointMove = moves.First();
+            foreach (var move in moves)
+            {
+                if (maxPointMove.point < move.point)
+                {
+                    maxPointMove = move;
+                }
+            }
+            return maxPointMove;
+        }
+
+        public static (int move, double point) Think(Board board, int depth)
+        {
+            List<int> setables = FindAllSetableBoxes(board, BoxStates.Mine);
+
+            if (depth <= 0)
+            {
+                List<double> points = new();
+
+                foreach (var indexToSet in setables)
+                {
+                    var newBoard = board.Set(indexToSet, BoxStates.Mine);
+
+                    // reflection
+                    List<int> reflectionMoves = ThinkReflection(newBoard);
+                    double pointAfterReflection = EvaluatePoints(reflectionMoves);
+
+                    points.Add(pointAfterReflection);
+                }
+
+                double pointAtLast = points.Max();
+                int retMove = points.IndexOf(pointAtLast); // !It returns only one even if there were the same moves!
+
+                return (retMove, pointAtLast);
+
+            }
+            else
+            {
+                List<(int move, double point)> selects = new();
+
+                foreach (var indexToSet in setables)
+                {
+                    // recourse
+                    var selected = Think(
+                        board,
+                        depth - 1
+                        );
+
+                    selects.Add(selected);
+                }
+
+                var retSelect = SelectMaxPointMove(selects);
+                return retSelect;
+            }
+        }
+
+        public static List<int> ThinkReflection(Board board)
+        {
+            List<int> points = new();
+            List<int> allSetables = FindAllSetableBoxes(board, BoxStates.Opponent);
+            foreach (var indexToSet in allSetables)
+            {
+                var newBoard = board.Set(indexToSet, BoxStates.Opponent);
+                points.Add(EvaluateBoard(board));
+            }
+            return points;
+        }
+    }
+}
