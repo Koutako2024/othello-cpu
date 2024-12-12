@@ -47,11 +47,11 @@ namespace OneDCPU
 
             for (int i = 0; i < board.array.Length - 1; i++)
             {
-                if (board.array[i] == BoxStates.None && board.array[i + 1] == opposite)
+                if (board.array[i] == BoxStates.Empty && board.array[i + 1] == opposite)
                 {
                     setables.Add(i);
                 }
-                else if (board.array[i] == opposite && board.array[i + 1] == BoxStates.None)
+                else if (board.array[i] == opposite && board.array[i + 1] == BoxStates.Empty)
                 {
                     setables.Add(i + 1);
                 }
@@ -86,8 +86,8 @@ namespace OneDCPU
                     var newBoard = board.Set(indexToSet, BoxStates.Mine);
 
                     // reflection
-                    List<int> reflectionMoves = ThinkReflection(newBoard);
-                    double pointAfterReflection = EvaluatePoints(reflectionMoves);
+                    List<int> reflectionPoints = ThinkReflection(newBoard);
+                    double pointAfterReflection = EvaluatePoints(reflectionPoints);
 
                     points.Add(pointAfterReflection);
                 }
@@ -122,10 +122,18 @@ namespace OneDCPU
         {
             List<int> points = new();
             List<int> allSetables = FindAllSetableBoxes(board, BoxStates.Opponent);
+
+            // finished case
+            if (allSetables.Count() == 0)
+            {
+                points.Add(EvaluateBoard(board));
+                return points;
+            }
+
             foreach (var indexToSet in allSetables)
             {
                 var newBoard = board.Set(indexToSet, BoxStates.Opponent);
-                points.Add(EvaluateBoard(board));
+                points.Add(EvaluateBoard(newBoard));
             }
             return points;
         }

@@ -13,7 +13,7 @@ namespace TestOneDCPU
                 BoxStates.Mine,
                 BoxStates.Opponent,
                 BoxStates.Mine,
-                BoxStates.None,
+                BoxStates.Empty,
                 ];
             Board board = new(array);
 
@@ -48,12 +48,12 @@ namespace TestOneDCPU
         public void TestFindAllSetables()
         {
             BoxStates[] array = [
-                BoxStates.None,
-                BoxStates.None,     // <-
+                BoxStates.Empty,
+                BoxStates.Empty,     // <-
                 BoxStates.Opponent,
                 BoxStates.Mine,
-                BoxStates.None,
-                BoxStates.None,     // <-
+                BoxStates.Empty,
+                BoxStates.Empty,     // <-
                 BoxStates.Opponent,
                 ];
             Board board = new(array);
@@ -72,10 +72,5 @@ namespace TestOneDCPU
             Assert.AreEqual((3, 3), result);
         }
 
-        [TestMethod]
-        public void TestThink()
-        {
-            //TODO
-        }
     }
 }

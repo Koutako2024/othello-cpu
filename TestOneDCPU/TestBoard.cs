@@ -37,34 +37,34 @@ namespace TestOneDCPU
                     [
                         new BoxStates[]
                         {
-                            BoxStates.None,
+                            BoxStates.Empty,
                             BoxStates.Opponent,
                             BoxStates.Opponent,
-                            BoxStates.None, // <- set mine here
+                            BoxStates.Empty, // <- set mine here
                             BoxStates.Opponent,
                             BoxStates.Opponent,
                             BoxStates.Mine,
-                            BoxStates.None,
+                            BoxStates.Empty,
                         },
                         3,
                         BoxStates.Mine,
                         new BoxStates[]
                         {
-                            BoxStates.None,
+                            BoxStates.Empty,
                             BoxStates.Opponent,
                             BoxStates.Opponent,
                             BoxStates.Mine,
                             BoxStates.Mine,
                             BoxStates.Mine,
                             BoxStates.Mine,
-                            BoxStates.None,
+                            BoxStates.Empty,
                         }
                     ],
 
                     [
                         new BoxStates[]
                         {
-                            BoxStates.None, // <- set mine here
+                            BoxStates.Empty, // <- set mine here
                         },
                         0,
                         BoxStates.Mine,
@@ -78,7 +78,7 @@ namespace TestOneDCPU
                         new BoxStates[]
                         {
                             BoxStates.Opponent,
-                            BoxStates.None, // <- set mine here
+                            BoxStates.Empty, // <- set mine here
                             BoxStates.Mine,
                         },
                         1,
@@ -101,20 +101,20 @@ namespace TestOneDCPU
                 object[] positiveAndMine = [
                     true,
                 new BoxStates[] {
-                    BoxStates.None,
+                    BoxStates.Empty,
                     BoxStates.Mine,
                     BoxStates.Opponent,
                     BoxStates.Opponent,
-                    BoxStates.None, //<- set mine here.
+                    BoxStates.Empty, //<- set mine here.
                     BoxStates.Opponent,
                     BoxStates.Opponent,
                     BoxStates.Mine,
-                    BoxStates.None,
+                    BoxStates.Empty,
                 },
                     4,
                     BoxStates.Mine,
                 new BoxStates[] {
-                    BoxStates.None,
+                    BoxStates.Empty,
                     BoxStates.Mine,
                     BoxStates.Opponent,
                     BoxStates.Opponent,
@@ -122,7 +122,7 @@ namespace TestOneDCPU
                     BoxStates.Mine,
                     BoxStates.Mine,
                     BoxStates.Mine,
-                    BoxStates.None,
+                    BoxStates.Empty,
                 }];
 
                 object[] negativeAndOpponent = [
@@ -131,7 +131,7 @@ namespace TestOneDCPU
                     BoxStates.Opponent,
                     BoxStates.Mine,
                     BoxStates.Mine,
-                    BoxStates.None, //<- set mine here.
+                    BoxStates.Empty, //<- set mine here.
                 },
                     3,
                     BoxStates.Opponent,

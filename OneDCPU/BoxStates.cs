@@ -8,7 +8,7 @@ namespace OneDCPU
 {
     public enum BoxStates
     {
-        None,
+        Empty,
         Mine,
         Opponent,
     }
