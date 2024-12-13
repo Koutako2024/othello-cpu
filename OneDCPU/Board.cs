@@ -81,5 +81,22 @@ namespace OneDCPU
 
             return newBoard;
         }
+
+        public override string ToString()
+        {
+            string output = "";
+            foreach (var box in array)
+            {
+
+                output += box switch
+                {
+                    BoxStates.Empty => "＿",
+                    BoxStates.Mine => "〇",
+                    BoxStates.Opponent => "●",
+                    _ => "？"
+                };
+            }
+            return output;
+        }
     }
 }

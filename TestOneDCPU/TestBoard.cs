@@ -29,6 +29,16 @@ namespace TestOneDCPU
             Assert.IsTrue(newArray.SequenceEqual(expected));
         }
 
+        [TestMethod]
+        public void TestToString()
+        {
+            Board board = new([BoxStates.Empty, BoxStates.Mine, BoxStates.Opponent]);
+
+            string output = board.ToString();
+
+            Assert.AreEqual("＿〇●", output);
+        }
+
         public static IEnumerable<object[]> DataOfTestSet
         {
             get

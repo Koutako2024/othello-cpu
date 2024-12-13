@@ -93,24 +93,46 @@ namespace OneDCPU
                 }
 
                 double pointAtLast = points.Max();
-                int retMove = points.IndexOf(pointAtLast); // !It returns only one even if there were the same moves!
+                int retMove = points.IndexOf(pointAtLast); // It returns only one even if there were the same moves!
 
                 return (retMove, pointAtLast);
 
             }
             else
             {
-                List<(int move, double point)> selects = new();
 
+                // [TODO] なんかおかしいねぇ。全然処理してないねぇ。
+                // My turn.
+                if (setables.Count() == 0)
+                {
+                    return (0, EvaluateBoard(board));
+                }
+
+                List<(int move, double point)> selects = new();
                 foreach (var indexToSet in setables)
                 {
-                    // recourse
-                    var selected = Think(
-                        board,
-                        depth - 1
-                        );
+                    var boardAfterMyThinking = board.Set(indexToSet, BoxStates.Mine);
 
-                    selects.Add(selected);
+                    // Opponent's turn.
+                    List<double> secondTurnSelects = new();
+                    List<int> OpponentsSetables = FindAllSetableBoxes(boardAfterMyThinking, BoxStates.Opponent);
+                    
+                    if (OpponentsSetables.Count() == 0)
+                    {
+                        selects.Add((indexToSet, EvaluateBoard(boardAfterMyThinking)));
+                        continue;
+                    }
+
+                    foreach (var OpponentsIndexToSet in OpponentsSetables)
+                    {
+                        var boardAfterOpponentsThinking = board.Set(OpponentsIndexToSet, BoxStates.Opponent);
+
+                        // My turn again.
+                        var selected = Think(boardAfterOpponentsThinking,depth - 1);
+                        secondTurnSelects.Add(selected.point);
+                    }
+
+                    selects.Add((indexToSet, secondTurnSelects.Max()));
                 }
 
                 var retSelect = SelectMaxPointMove(selects);
