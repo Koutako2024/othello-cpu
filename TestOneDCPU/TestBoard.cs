@@ -36,7 +36,7 @@ namespace TestOneDCPU
 
             string output = board.ToString();
 
-            Assert.AreEqual("＿〇●", output);
+            Assert.AreEqual("_O*", output);
         }
 
         public static IEnumerable<object[]> DataOfTestSet

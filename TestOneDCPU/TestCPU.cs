@@ -47,21 +47,50 @@ namespace TestOneDCPU
         [TestMethod]
         public void TestFindAllSetables()
         {
-            BoxStates[] array = [
+            Board board = new([
                 BoxStates.Empty,
-                BoxStates.Empty,     // <-
+                BoxStates.Empty,
                 BoxStates.Opponent,
                 BoxStates.Mine,
-                BoxStates.Empty,
-                BoxStates.Empty,     // <-
                 BoxStates.Opponent,
-                ];
-            Board board = new(array);
+                BoxStates.Opponent,
+                BoxStates.Opponent,
+                BoxStates.Empty,
+                BoxStates.Mine,
+                BoxStates.Empty,
+                BoxStates.Opponent,
+                BoxStates.Empty,
+                BoxStates.Opponent,
+            ]);
 
             List<int> actual = CPU.FindAllSetableBoxes(board, BoxStates.Mine);
 
-            List<int> expected = [1, 5];
+            List<int> expected = [1, 7];
             Assert.IsTrue(actual.SequenceEqual(expected));
+        }
+
+        [TestMethod]
+        public void TestFindHalfSetableBoxes()
+        {
+            Board board = new([
+                BoxStates.Empty,
+                BoxStates.Empty,
+                BoxStates.Opponent,
+                BoxStates.Mine,
+                BoxStates.Empty,
+                BoxStates.Opponent,
+                BoxStates.Opponent,
+                BoxStates.Opponent,
+                BoxStates.Mine,
+                BoxStates.Empty,
+                BoxStates.Opponent,
+                BoxStates.Empty,
+                BoxStates.Opponent,
+            ]);
+
+            var result = CPU.FindHalfSetableBoxes(board, BoxStates.Mine);
+
+            Assert.IsTrue(result.SequenceEqual([1, 4]));
         }
 
         [TestMethod]

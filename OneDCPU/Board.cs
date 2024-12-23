@@ -90,9 +90,9 @@ namespace OneDCPU
 
                 output += box switch
                 {
-                    BoxStates.Empty => "＿",
-                    BoxStates.Mine => "〇",
-                    BoxStates.Opponent => "●",
+                    BoxStates.Empty => "_",
+                    BoxStates.Mine => "O",
+                    BoxStates.Opponent => "*",
                     _ => "？"
                 };
             }

@@ -34,26 +34,56 @@ namespace OneDCPU
             return point;
         }
 
-        public static double EvaluatePoints(List<int> points)
-        {
-            List<double> doubleList = [.. points];
-            return EvaluatePoints(doubleList);
-        }
+        public static double EvaluatePoints(List<int> points) => EvaluatePoints(points.ConvertAll(static x => (double)x));//List<double> doubleList = [.. points];//return EvaluatePoints(doubleList);
 
         public static List<int> FindAllSetableBoxes(Board board, BoxStates side)
+        {
+            BoxStates opposite = (side == BoxStates.Mine) ? BoxStates.Opponent : BoxStates.Mine;
+
+            // _*...O
+            List<int> setables = FindHalfSetableBoxes(board, side);
+
+            // O*..._
+            List<int> reversedSetables = FindHalfSetableBoxes(new(board.array.Reverse().ToArray()), side);
+            foreach (int index in reversedSetables)
+            {
+                int normalOrder = board.array.Length - index - 1;
+                setables.Add(normalOrder);
+            }
+
+            return setables;
+        }
+
+        /// <summary>
+        /// Find only the pattern "_*...O". This doesn't find the reverse of above.
+        /// </summary>
+        /// <param name="board"></param>
+        /// <param name="side"></param>
+        /// <returns></returns>
+        public static List<int> FindHalfSetableBoxes(Board board, BoxStates side)
         {
             List<int> setables = new();
             BoxStates opposite = (side == BoxStates.Mine) ? BoxStates.Opponent : BoxStates.Mine;
 
-            for (int i = 0; i < board.array.Length - 1; i++)
+            for (int i = 0; i < board.array.Length - 2; i++)
             {
                 if (board.array[i] == BoxStates.Empty && board.array[i + 1] == opposite)
                 {
-                    setables.Add(i);
-                }
-                else if (board.array[i] == opposite && board.array[i + 1] == BoxStates.Empty)
-                {
-                    setables.Add(i + 1);
+                    // find "[*...]O" the pattern of the rest.
+                    bool canSet = false;
+                    for (int j = i + 2; j < board.array.Length; j++)
+                    {
+                        if (board.array[j] == side)
+                        {
+                            canSet = true;
+                            break;
+                        }
+                        else if (board.array[j] == BoxStates.Empty)
+                        {
+                            break;
+                        }
+                    }
+                    if (canSet) setables.Add(i);
                 }
             }
 
@@ -116,7 +146,7 @@ namespace OneDCPU
                     // Opponent's turn.
                     List<double> secondTurnSelects = new();
                     List<int> OpponentsSetables = FindAllSetableBoxes(boardAfterMyThinking, BoxStates.Opponent);
-                    
+
                     if (OpponentsSetables.Count() == 0)
                     {
                         selects.Add((indexToSet, EvaluateBoard(boardAfterMyThinking)));
@@ -128,7 +158,7 @@ namespace OneDCPU
                         var boardAfterOpponentsThinking = board.Set(OpponentsIndexToSet, BoxStates.Opponent);
 
                         // My turn again.
-                        var selected = Think(boardAfterOpponentsThinking,depth - 1);
+                        var selected = Think(boardAfterOpponentsThinking, depth - 1);
                         secondTurnSelects.Add(selected.point);
                     }
 
