@@ -92,7 +92,7 @@ public class Board
             if (line[i + 1] != opponent) continue;
             int j = i + 2;
             for (; j < Size && line[j] == opponent; j++) ;
-            if (line[j] == Box.Green) setables.Add(j);
+            if (j < Size && line[j] == Box.Green) setables.Add(j);
             i = j;
         }
 
