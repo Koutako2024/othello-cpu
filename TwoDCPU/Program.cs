@@ -14,6 +14,10 @@ internal class Program
             var setables = board.GetSetable(turn);
             if (setables.Count == 0)
             {
+                if (board.GetSetable(board.GetOpponentBox(turn)).Count == 0)
+                {
+                    break;
+                }
                 Console.WriteLine("Skip. (You can't set anywhere.)");
                 continue;
             }
@@ -36,6 +40,12 @@ internal class Program
                 }
             } while (true);
         }
+
+        (int green, int black, int white) = board.Count();
+        Console.WriteLine($"Green: {green}");
+        Console.WriteLine($"Black: {black}");
+        Console.WriteLine($"White: {white}");
+        Console.WriteLine((black == white ? "Draw!" : (black > white ? "Black" : "White") + " Win!"));
         Console.WriteLine("End!");
     }
 }

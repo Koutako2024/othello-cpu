@@ -165,7 +165,6 @@ public class Board
             .Distinct()
             .ToList();
 
-
     public void Set(Box toSet, int i, int j)
     {
         if (!GetSetable(toSet).Exists(pair => (pair == (i, j))))
@@ -173,6 +172,25 @@ public class Board
 
         Data[i, j] = toSet;
         GetFlipper(toSet, i, j).ForEach(pair => Data[pair.Item1, pair.Item2] = toSet);
+    }
+
+    public (int green, int black, int white) Count()
+    {
+        int green = 0, black = 0, white = 0;
+        for (int i = 0; i < Size; i++)
+        {
+            for (int j = 0; j < Size; j++)
+            {
+                var _ = Data[i, j] switch
+                {
+                    Box.Green => green++,
+                    Box.Black => black++,
+                    Box.White => white++,
+                    _ => throw new Exception("What?!"),
+                };
+            }
+        }
+        return (green, black, white);
     }
 
 }
