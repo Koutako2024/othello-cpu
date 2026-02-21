@@ -6,9 +6,36 @@ internal class Program
     {
         Console.WriteLine("Start!");
         Board board = new();
-        board.Print();
-        Console.WriteLine("Setable of black");
-        board.GetSetable(Box.Black).ForEach(pair => Console.WriteLine(pair));
+        for (Box turn = Box.Black; ; turn = board.GetOpponentBox(turn))
+        {
+            board.Print();
+
+            Console.WriteLine($"Setable of {turn}");
+            var setables = board.GetSetable(turn);
+            if (setables.Count == 0)
+            {
+                Console.WriteLine("Skip. (You can't set anywhere.)");
+                continue;
+            }
+            foreach (var pair in setables) Console.WriteLine(pair);
+
+            do
+            {
+                Console.Write($"set {turn} in row?>");
+                try
+                {
+                    int i = int.Parse(Console.ReadLine() ?? "read line returned null!");
+                    Console.Write("colmn?>");
+                    int j = int.Parse(Console.ReadLine() ?? "read line returned null!");
+                    board.Set(turn, i, j);
+                    break;
+                }
+                catch
+                {
+                    Console.WriteLine("Error!");
+                }
+            } while (true);
+        }
         Console.WriteLine("End!");
     }
 }

@@ -132,4 +132,12 @@ public class Board
         return setables.Distinct().ToList();
     }
 
+    public void Set(Box box, int i, int j)
+    {
+        if (!GetSetable(box).Exists(pair => (pair == (i, j))))
+            throw new ArgumentException($"{box} can't be set in index ({i}, {j})!");
+
+        Data[i, j] = box;
+    }
+
 }
