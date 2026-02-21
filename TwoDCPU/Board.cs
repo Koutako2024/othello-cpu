@@ -132,12 +132,47 @@ public class Board
         return setables.Distinct().ToList();
     }
 
-    public void Set(Box box, int i, int j)
+    private List<int> GetFlipperInLineOneDirection(Box toSet, Box[] line, int index)
     {
-        if (!GetSetable(box).Exists(pair => (pair == (i, j))))
-            throw new ArgumentException($"{box} can't be set in index ({i}, {j})!");
+        Box opponent = GetOpponentBox(toSet);
+        List<int> flippers = new();
 
-        Data[i, j] = box;
+        // from left to right
+        int i = index + 1;
+        for (; i < Size && line[i] == opponent; i++)
+        {
+            flippers.Add(i);
+        }
+
+        return (i < Size && line[i] == toSet ? flippers : []);
+    }
+
+    private List<int> GetFlipperInLine(Box toSet, Box[] line, int index)
+        => GetFlipperInLineOneDirection(toSet, line, index)
+            .Concat(
+                GetFlipperInLineOneDirection(toSet, line.Reverse().ToArray(), Size - index - 1)
+                    .Select(i => Size - i - 1)
+            )
+            .ToList();
+
+    private List<(int, int)> GetFlipper(Box toSet, int i, int j)
+        => GetFlipperInLine(toSet, GetRow(i), j)
+            .Select(k => (i, k))
+            .Concat(
+                GetFlipperInLine(toSet, GetColmn(j), i)
+                .Select(k => (k, j))
+            )
+            .Distinct()
+            .ToList();
+
+
+    public void Set(Box toSet, int i, int j)
+    {
+        if (!GetSetable(toSet).Exists(pair => (pair == (i, j))))
+            throw new ArgumentException($"{toSet} can't be set in index ({i}, {j})!");
+
+        Data[i, j] = toSet;
+        GetFlipper(toSet, i, j).ForEach(pair => Data[pair.Item1, pair.Item2] = toSet);
     }
 
 }
