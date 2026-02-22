@@ -192,4 +192,5 @@ public class Board
         return (green, black, white);
     }
 
+    public Board Copy() => new Board { Data = (Box[,])Data.Clone() };
 }
