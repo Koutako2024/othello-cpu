@@ -6,39 +6,48 @@ internal class Program
     {
         Console.WriteLine("Start!");
         Board board = new();
+        Box player = Box.Black;
         for (Box turn = Box.Black; ; turn = board.GetOpponentBox(turn))
         {
             board.Print();
 
-            Console.WriteLine($"Setable of {turn}");
+            Console.WriteLine($"{turn}'s Turn.");
             var setables = board.GetSetable(turn);
             if (setables.Count == 0)
             {
                 if (board.GetSetable(board.GetOpponentBox(turn)).Count == 0)
-                {
                     break;
-                }
+
                 Console.WriteLine("Skip. (You can't set anywhere.)");
                 continue;
             }
-            foreach (var pair in setables) Console.WriteLine(pair);
+            setables.ForEach(pair => Console.WriteLine(pair));
 
-            do
+            if (turn == player)
             {
-                Console.Write($"set {turn} in row?>");
-                try
+                do
                 {
-                    int i = int.Parse(Console.ReadLine() ?? "read line returned null!");
-                    Console.Write("colmn?>");
-                    int j = int.Parse(Console.ReadLine() ?? "read line returned null!");
-                    board.Set(turn, i, j);
-                    break;
-                }
-                catch
-                {
-                    Console.WriteLine("Error!");
-                }
-            } while (true);
+                    Console.Write($"set {turn} in row?>");
+                    try
+                    {
+                        int i = int.Parse(Console.ReadLine() ?? "read line returned null!");
+                        Console.Write("colmn?>");
+                        int j = int.Parse(Console.ReadLine() ?? "read line returned null!");
+                        board.Set(turn, i, j);
+                        break;
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Error!");
+                    }
+                } while (true);
+            }
+            else
+            {
+                (int, int) pos = CPU.Run(board, turn);
+                board.Set(turn, pos);
+                Console.WriteLine($"{turn} set at {pos}.");
+            }
         }
 
         (int green, int black, int white) = board.Count();
