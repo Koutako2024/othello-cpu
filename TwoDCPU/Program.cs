@@ -7,7 +7,7 @@ internal class Program
         Console.WriteLine("Start!");
         Board board = new();
         Box player = Box.Black;
-        for (Box turn = Box.Black; ; turn = board.GetOpponentBox(turn))
+        for (Box turn = Box.Black; ; turn = Board.GetOpponentBox(turn))
         {
             board.Print();
 
@@ -15,7 +15,7 @@ internal class Program
             var setables = board.GetSetable(turn);
             if (setables.Count == 0)
             {
-                if (board.GetSetable(board.GetOpponentBox(turn)).Count == 0)
+                if (board.GetSetable(Board.GetOpponentBox(turn)).Count == 0)
                     break;
 
                 Console.WriteLine("Skip. (You can't set anywhere.)");
@@ -36,9 +36,13 @@ internal class Program
                         board.Set(turn, i, j);
                         break;
                     }
-                    catch
+                    catch (FormatException)
                     {
-                        Console.WriteLine("Error!");
+                        Console.WriteLine("Please input integer!");
+                    }
+                    catch (ArgumentException)
+                    {
+                        Console.WriteLine("You can't set there!");
                     }
                 } while (true);
             }

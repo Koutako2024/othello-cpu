@@ -50,7 +50,7 @@ public class Board
         Console.WriteLine();
     }
 
-    public Box GetOpponentBox(Box box) => box switch
+    public static Box GetOpponentBox(Box box) => box switch
     {
         Box.Black => Box.White,
         Box.White => Box.Black,
@@ -77,28 +77,81 @@ public class Board
         return col;
     }
 
-    private List<int> GetSetableInLineOneDirection(Box setter, Box[] line)
+    /// <summary>
+    ///     The line from left down to right up.
+    /// </summary>
+    /// <param name="index">
+    ///     (0 &lt;= i+j &lt;= (14=2*(SIZE-1)))
+    /// </param>
+    /// <returns>
+    ///     length is dynamic.
+    /// </returns>
+    public Box[] GetSlash(int index)
+    {
+        if (index < SIZE)
+        {
+            var slash = new Box[index + 1];
+            for (int i = index, j = 0; i >= 0; i--, j++)
+                slash[j] = Data[i, j];
+            return slash;
+        }
+        else
+        {
+            var slash = new Box[2 * SIZE - index - 1];
+            for (int i = SIZE - 1, j = index - SIZE + 1, k = 0; j < SIZE; i--, j++, k++)
+                slash[k] = Data[i, j];
+            return slash;
+        }
+    }
+
+    /// <summary>
+    ///     the line from left up to right down.
+    /// </summary>
+    /// <param name="index">
+    ///     (-(SIZE-1) &lt;= i-j &lt;= (SIZE-1))
+    /// </param>
+    /// <returns>
+    ///     length is dynamic.
+    /// </returns>
+    public Box[] GetBackSlash(int index)
+    {
+        if (index <= 0)
+        {
+            var backslash = new Box[index + SIZE];
+            for (int i = 0, j = -index; j < SIZE; i++, j++)
+                backslash[i] = Data[i, j];
+            return backslash;
+        }
+        else
+        {
+            var backslash = new Box[SIZE - index];
+            for (int i = index, j = 0; i < SIZE; i++, j++)
+                backslash[j] = Data[i, j];
+            return backslash;
+        }
+    }
+
+    private static List<int> GetSetableInLineOneDirection(Box setter, Box[] line)
     {
         Box opponent = GetOpponentBox(setter);
         List<int> setables = new();
 
-
         // /^.*(mine)(opponent)+(green).*$/
-        for (int i = 0; i < SIZE; i++)
+        for (int i = 0; i < line.Length; i++)
         {
-            for (; i < SIZE && line[i] != setter; i++) ;
-            if (i + 1 >= SIZE) break;
+            for (; i < line.Length && line[i] != setter; i++) ;
+            if (i + 1 >= line.Length) break;
             if (line[i + 1] != opponent) continue;
             int j = i + 2;
-            for (; j < SIZE && line[j] == opponent; j++) ;
-            if (j < SIZE && line[j] == Box.Green) setables.Add(j);
+            for (; j < line.Length && line[j] == opponent; j++) ;
+            if (j < line.Length && line[j] == Box.Green) setables.Add(j);
             i = j;
         }
 
         return setables;
     }
 
-    public List<int> GetSetableInLine(Box setter, Box[] line)
+    public static List<int> GetSetableInLine(Box setter, Box[] line)
     {
         Box opponent = GetOpponentBox(setter);
         List<int> setables = new();
@@ -110,7 +163,7 @@ public class Board
         // check another direction.
         Array.Reverse(line);
         GetSetableInLineOneDirection(setter, line)
-            .ForEach(i => setables.Add(SIZE - i - 1));
+            .ForEach(i => setables.Add(line.Length - i - 1));
 
         return setables;
     }
@@ -131,26 +184,26 @@ public class Board
         return setables.Distinct().ToList();
     }
 
-    private List<int> GetFlipperInLineOneDirection(Box toSet, Box[] line, int index)
+    private static List<int> GetFlipperInLineOneDirection(Box toSet, Box[] line, int index)
     {
         Box opponent = GetOpponentBox(toSet);
         List<int> flippers = new();
 
         // from left to right
         int i = index + 1;
-        for (; i < SIZE && line[i] == opponent; i++)
+        for (; i < line.Length && line[i] == opponent; i++)
         {
             flippers.Add(i);
         }
 
-        return (i < SIZE && line[i] == toSet ? flippers : []);
+        return (i < line.Length && line[i] == toSet ? flippers : []);
     }
 
-    private List<int> GetFlipperInLine(Box toSet, Box[] line, int index)
+    private static List<int> GetFlipperInLine(Box toSet, Box[] line, int index)
         => GetFlipperInLineOneDirection(toSet, line, index)
             .Concat(
-                GetFlipperInLineOneDirection(toSet, line.Reverse().ToArray(), SIZE - index - 1)
-                    .Select(i => SIZE - i - 1)
+                GetFlipperInLineOneDirection(toSet, line.Reverse().ToArray(), line.Length - index - 1)
+                    .Select(i => line.Length - i - 1)
             )
             .ToList();
 
@@ -159,7 +212,23 @@ public class Board
             .Select(k => (i, k))
             .Concat(
                 GetFlipperInLine(toSet, GetColmn(j), i)
-                .Select(k => (k, j))
+                    .Select(k => (k, j))
+            )
+            .Concat(
+                GetFlipperInLine(toSet, GetSlash(i + j), (i + j < SIZE ? j : SIZE - 1 - i))
+                    .Select(k => (
+                        i + j < SIZE
+                        ? (i + j - k, k)
+                        : (SIZE - 1 - k, i + j - (SIZE - 1 - k))
+                    ))
+            )
+            .Concat(
+                GetFlipperInLine(toSet, GetBackSlash(i - j), (i - j <= 0 ? i : j))
+                    .Select(k => (
+                        i - j <= 0
+                        ? (k, k - (i - j))
+                        : (i - j + k, k)
+                    ))
             )
             .Distinct()
             .ToList();
