@@ -164,6 +164,7 @@ public class Board
             .Distinct()
             .ToList();
 
+    public void Set(Box toSet, (int i, int j) pos) => Set(toSet, pos.i, pos.j);
     public void Set(Box toSet, int i, int j)
     {
         if (!GetSetable(toSet).Exists(pair => (pair == (i, j))))
