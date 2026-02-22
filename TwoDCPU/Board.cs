@@ -2,16 +2,15 @@ namespace TwoDCPU;
 
 public class Board
 {
-    public int Size;
+    public const int SIZE = 8;
     public Box[,] Data;
 
-    public Board(int size = 8)
+    public Board()
     {
-        Size = size;
-        Data = new Box[size, size];
-        for (int i = 0; i < size; i++)
+        Data = new Box[SIZE, SIZE];
+        for (int i = 0; i < SIZE; i++)
         {
-            for (int j = 0; j < size; j++)
+            for (int j = 0; j < SIZE; j++)
             {
                 Data[i, j] = Box.Green;
             }
@@ -25,14 +24,14 @@ public class Board
     public void Print()
     {
         Console.Write(" ");
-        for (int i = 0; i < Size; i++) Console.Write(i % 10);
+        for (int i = 0; i < SIZE; i++) Console.Write(i % 10);
         Console.WriteLine();
 
-        for (int i = 0; i < Size; i++)
+        for (int i = 0; i < SIZE; i++)
         {
             Console.Write(i);
 
-            for (int j = 0; j < Size; j++)
+            for (int j = 0; j < SIZE; j++)
             {
                 Console.Write(Data[i, j] switch
                 {
@@ -47,7 +46,7 @@ public class Board
         }
 
         Console.Write(" ");
-        for (int i = 0; i < Size; i++) Console.Write(i % 10);
+        for (int i = 0; i < SIZE; i++) Console.Write(i % 10);
         Console.WriteLine();
     }
 
@@ -60,8 +59,8 @@ public class Board
 
     public Box[] GetRow(int index)
     {
-        var line = new Box[Size];
-        for (int i = 0; i < Size; i++)
+        var line = new Box[SIZE];
+        for (int i = 0; i < SIZE; i++)
         {
             line[i] = Data[index, i];
         }
@@ -70,8 +69,8 @@ public class Board
 
     public Box[] GetColmn(int index)
     {
-        var col = new Box[Size];
-        for (int i = 0; i < Size; i++)
+        var col = new Box[SIZE];
+        for (int i = 0; i < SIZE; i++)
         {
             col[i] = Data[i, index];
         }
@@ -85,14 +84,14 @@ public class Board
 
 
         // /^.*(mine)(opponent)+(green).*$/
-        for (int i = 0; i < Size; i++)
+        for (int i = 0; i < SIZE; i++)
         {
-            for (; i < Size && line[i] != setter; i++) ;
-            if (i + 1 >= Size) break;
+            for (; i < SIZE && line[i] != setter; i++) ;
+            if (i + 1 >= SIZE) break;
             if (line[i + 1] != opponent) continue;
             int j = i + 2;
-            for (; j < Size && line[j] == opponent; j++) ;
-            if (j < Size && line[j] == Box.Green) setables.Add(j);
+            for (; j < SIZE && line[j] == opponent; j++) ;
+            if (j < SIZE && line[j] == Box.Green) setables.Add(j);
             i = j;
         }
 
@@ -111,7 +110,7 @@ public class Board
         // check another direction.
         Array.Reverse(line);
         GetSetableInLineOneDirection(setter, line)
-            .ForEach(i => setables.Add(Size - i - 1));
+            .ForEach(i => setables.Add(SIZE - i - 1));
 
         return setables;
     }
@@ -121,11 +120,11 @@ public class Board
         List<(int, int)> setables = new();
 
         // check rows
-        for (int i = 0; i < Size; i++)
+        for (int i = 0; i < SIZE; i++)
             GetSetableInLine(setter, GetRow(i)).ForEach(j => setables.Add((i, j)));
 
         // check colmns
-        for (int i = 0; i < Size; i++)
+        for (int i = 0; i < SIZE; i++)
             GetSetableInLine(setter, GetColmn(i)).ForEach(j => setables.Add((j, i)));
 
         // to unique
@@ -139,19 +138,19 @@ public class Board
 
         // from left to right
         int i = index + 1;
-        for (; i < Size && line[i] == opponent; i++)
+        for (; i < SIZE && line[i] == opponent; i++)
         {
             flippers.Add(i);
         }
 
-        return (i < Size && line[i] == toSet ? flippers : []);
+        return (i < SIZE && line[i] == toSet ? flippers : []);
     }
 
     private List<int> GetFlipperInLine(Box toSet, Box[] line, int index)
         => GetFlipperInLineOneDirection(toSet, line, index)
             .Concat(
-                GetFlipperInLineOneDirection(toSet, line.Reverse().ToArray(), Size - index - 1)
-                    .Select(i => Size - i - 1)
+                GetFlipperInLineOneDirection(toSet, line.Reverse().ToArray(), SIZE - index - 1)
+                    .Select(i => SIZE - i - 1)
             )
             .ToList();
 
@@ -177,9 +176,9 @@ public class Board
     public (int green, int black, int white) Count()
     {
         int green = 0, black = 0, white = 0;
-        for (int i = 0; i < Size; i++)
+        for (int i = 0; i < SIZE; i++)
         {
-            for (int j = 0; j < Size; j++)
+            for (int j = 0; j < SIZE; j++)
             {
                 var _ = Data[i, j] switch
                 {
